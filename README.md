@@ -1,305 +1,386 @@
-# Parking Management System API
+# Parking Management Frontend
 
-A comprehensive Spring Boot REST API for managing parking facilities, users, and access control with role-based authentication.
+A modern, responsive React TypeScript application for managing parking facilities with role-based authentication and state management.
 
-## Features
+## 🚀 Features
 
-- **User Management**: Complete CRUD operations for users with role-based access control
-- **Authentication**: JWT-based authentication with refresh tokens
-- **Role-Based Security**: Support for 5 user roles (General Admin, Company Admin, Supervisor, Operator, Client)
-- **Company Management**: Multi-tenant support for parking companies
-- **Password Recovery**: Secure password reset functionality
-- **RESTful API**: Well-designed REST endpoints with comprehensive error handling
-- **Database Integration**: PostgreSQL with JPA/Hibernate
-- **Security**: BCrypt password hashing and Spring Security integration
+- **Authentication System**: Secure JWT-based authentication with refresh tokens
+- **Role-Based Access Control**: Support for multiple user roles (Admin, Company Admin, Supervisor, Operator, Client)
+- **State Management**: Redux Toolkit with persistence for reliable state management
+- **Responsive Design**: Mobile-first design with Tailwind CSS
+- **Type Safety**: Full TypeScript implementation with strict type checking
+- **Form Validation**: Comprehensive client-side validation with user-friendly error messages
+- **Route Protection**: Secure routing with role-based access control
+- **Modern UI**: Clean, intuitive interface with accessibility features
 
-## Technology Stack
+## 🛠 Technology Stack
 
-- **Java 17**
-- **Spring Boot 3.2.0**
-- **Spring Security 6**
-- **Spring Data JPA**
-- **PostgreSQL**
-- **JWT (JSON Web Tokens)**
-- **Maven**
-- **Lombok**
-- **MapStruct**
+- **React 18** - Modern React with hooks and concurrent features
+- **TypeScript** - Type-safe development
+- **Redux Toolkit** - Efficient state management
+- **React Router v6** - Client-side routing
+- **Tailwind CSS** - Utility-first CSS framework
+- **Axios** - HTTP client with interceptors
+- **React Hook Form** - Performant form handling
+- **Redux Persist** - State persistence
 
-## User Roles
-
-1. **General Admin**: System-wide access, can manage all companies and users
-2. **Company Admin**: Full access to their company's data and users
-3. **Supervisor**: Manages specific parking locations
-4. **Operator**: Day-to-day operations at assigned locations
-5. **Client**: Vehicle owners who use parking services
-
-## Project Structure
+## 📁 Project Structure
 
 \`\`\`
 src/
-├── main/
-│   ├── java/com/parkingmanagement/
-│   │   ├── config/              # Configuration classes
-│   │   ├── controller/          # REST controllers
-│   │   ├── dto/                 # Data Transfer Objects
-│   │   │   ├── request/         # Request DTOs
-│   │   │   └── response/        # Response DTOs
-│   │   ├── exception/           # Custom exceptions and handlers
-│   │   ├── mapper/              # MapStruct mappers
-│   │   ├── model/               # JPA entities and enums
-│   │   │   ├── entity/          # JPA entities
-│   │   │   └── enums/           # Enumerations
-│   │   ├── repository/          # JPA repositories
-│   │   ├── security/            # Security components
-│   │   └── service/             # Business logic services
-│   └── resources/
-│       ├── application.yml      # Main configuration
-│       └── application-dev.yml  # Development configuration
-└── test/                        # Test classes
+├── components/          # Reusable UI components
+│   ├── auth/           # Authentication-related components
+│   └── ui/             # Generic UI components
+├── hooks/              # Custom React hooks
+├── pages/              # Page components
+│   ├── auth/           # Authentication pages
+│   └── ...             # Other pages
+├── services/           # API services and external integrations
+├── store/              # Redux store configuration
+│   └── slices/         # Redux slices
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+└── App.tsx             # Main application component
 \`\`\`
 
-## Getting Started
+## 🚦 Getting Started
 
 ### Prerequisites
 
-- Java 17 or higher
-- Maven 3.6+
-- PostgreSQL 12+ (for production)
+- Node.js 16+ and npm/yarn
+- Backend API running on http://localhost:8080
 
 ### Installation
 
 1. **Clone the repository**
    \`\`\`bash
    git clone <repository-url>
-   cd parking-management-api
+   cd parking-management-frontend
    \`\`\`
 
-2. **Set up the database**
-   \`\`\`sql
-   CREATE DATABASE parking_management;
-   CREATE USER parking_user WITH PASSWORD 'parking_password';
-   GRANT ALL PRIVILEGES ON DATABASE parking_management TO parking_user;
-   \`\`\`
-
-3. **Configure environment variables**
+2. **Install dependencies**
    \`\`\`bash
-   export DB_USERNAME=parking_user
-   export DB_PASSWORD=parking_password
-   export JWT_SECRET=your-secret-key-here
+   npm install
+   # or
+   yarn install
    \`\`\`
 
-4. **Build and run the application**
+3. **Environment setup**
    \`\`\`bash
-   mvn clean install
-   mvn spring-boot:run
+   cp .env.example .env.development
+   # Edit .env.development with your configuration
    \`\`\`
 
-   Or for development with H2 database:
+4. **Start development server**
    \`\`\`bash
-   mvn spring-boot:run -Dspring-boot.run.profiles=dev
+   npm start
+   # or
+   yarn start
    \`\`\`
 
-### API Documentation
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-The API follows RESTful conventions and returns JSON responses. All endpoints except authentication require a valid JWT token.
+## 🔐 Authentication Flow
 
-#### Authentication Header
+### Login Process
+1. User enters credentials on login page
+2. Frontend sends POST request to `/api/auth/login`
+3. Backend validates credentials and returns JWT tokens
+4. Tokens are stored in Redux store and localStorage
+5. User is redirected to dashboard
+
+### Token Management
+- **Access Token**: Short-lived token for API requests
+- **Refresh Token**: Long-lived token for obtaining new access tokens
+- **Automatic Refresh**: Interceptors handle token refresh transparently
+
+### Route Protection
+\`\`\`typescript
+// Protected route example
+<ProtectedRoute requiredRoles={[UserRole.ADMIN]}>
+  <AdminPanel />
+</ProtectedRoute>
+
+// Public route example
+<PublicRoute>
+  <LoginPage />
+</PublicRoute>
 \`\`\`
-Authorization: Bearer <jwt-token>
+
+## 🎨 UI Components
+
+### Button Component
+\`\`\`typescript
+<Button 
+  variant="primary" 
+  size="lg" 
+  isLoading={isSubmitting}
+  leftIcon={<Icon />}
+>
+  Submit
+</Button>
 \`\`\`
 
-#### Standard Response Format
+### Input Component
+\`\`\`typescript
+<Input
+  label="Email"
+  type="email"
+  error={errors.email}
+  leftIcon={<EmailIcon />}
+  placeholder="Enter your email"
+/>
+\`\`\`
 
-**Success Response:**
-\`\`\`json
+### Alert Component
+\`\`\`typescript
+<Alert variant="error" onClose={clearError}>
+  Error message here
+</Alert>
+\`\`\`
+
+## 📱 Responsive Design
+
+The application is built with a mobile-first approach:
+
+- **Mobile**: 320px - 768px
+- **Tablet**: 768px - 1024px  
+- **Desktop**: 1024px+
+
+Key responsive features:
+- Adaptive navigation
+- Flexible grid layouts
+- Touch-friendly interactions
+- Optimized form layouts
+
+## 🔧 State Management
+
+### Redux Store Structure
+\`\`\`typescript
 {
-  "status": "success",
-  "code": 200,
-  "data": { ... },
-  "message": "Operation completed successfully"
-}
-\`\`\`
-
-**Error Response:**
-\`\`\`json
-{
-  "status": "error",
-  "code": 400,
-  "error": {
-    "type": "ValidationError",
-    "message": "Error description",
-    "details": { ... }
+  auth: {
+    user: User | null,
+    tokens: AuthTokens | null,
+    isAuthenticated: boolean,
+    isLoading: boolean,
+    error: string | null
   }
 }
 \`\`\`
 
-### API Endpoints
+### Using Authentication Hook
+\`\`\`typescript
+const { 
+  user, 
+  isAuthenticated, 
+  login, 
+  logout, 
+  isLoading 
+} = useAuth();
+\`\`\`
 
-#### Authentication Endpoints
+## 🧪 Testing
 
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|---------|
-| POST | `/api/auth/login` | User login | Public |
-| POST | `/api/auth/register` | User registration | Admin only |
-| POST | `/api/auth/password/reset-request` | Request password reset | Public |
-| POST | `/api/auth/password/reset-confirm` | Confirm password reset | Public |
-| POST | `/api/auth/token/refresh` | Refresh access token | Public |
-| POST | `/api/auth/logout` | User logout | Authenticated |
-
-#### User Management Endpoints
-
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|---------|
-| GET | `/api/users` | List all users | Admin |
-| GET | `/api/users/{id}` | Get user by ID | Admin/Self |
-| PUT | `/api/users/{id}` | Update user | Admin |
-| DELETE | `/api/users/{id}` | Delete user | Admin |
-| GET | `/api/users/me` | Get current user | Authenticated |
-
-### Example API Calls
-
-#### 1. User Login
+### Running Tests
 \`\`\`bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@example.com",
-    "password": "password123"
-  }'
+npm test
+# or
+yarn test
 \`\`\`
 
-**Response:**
-\`\`\`json
-{
-  "status": "success",
-  "code": 200,
-  "data": {
-    "user": {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "email": "admin@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "role": "GENERAL_ADMIN",
-      "companyId": null,
-      "isActive": true
-    },
-    "tokens": {
-      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "expiresIn": 86400
-    }
-  },
-  "message": "Login successful"
-}
-\`\`\`
-
-#### 2. Register New User
+### Test Coverage
 \`\`\`bash
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <jwt-token>" \
-  -d '{
-    "email": "newuser@example.com",
-    "password": "securePassword123",
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "phone": "+1-555-1234",
-    "role": "COMPANY_ADMIN",
-    "companyId": "123e4567-e89b-12d3-a456-426614174001"
-  }'
+npm run test:coverage
+# or
+yarn test:coverage
 \`\`\`
 
-#### 3. Get All Users
+## 🚀 Building for Production
+
+### Build Application
 \`\`\`bash
-curl -X GET "http://localhost:8080/api/users?page=0&limit=20&search=john&role=COMPANY_ADMIN" \
-  -H "Authorization: Bearer <jwt-token>"
+npm run build
+# or
+yarn build
 \`\`\`
 
-#### 4. Update User
+### Environment Variables
+Set production environment variables in `.env.production`:
+\`\`\`env
+REACT_APP_API_BASE_URL=https://api.parkingmanagement.com/api
+REACT_APP_DEBUG=false
+\`\`\`
+
+## 🔒 Security Features
+
+### Authentication Security
+- JWT tokens with expiration
+- Automatic token refresh
+- Secure token storage
+- CSRF protection
+
+### Input Validation
+- Client-side validation
+- XSS prevention
+- SQL injection protection
+- Input sanitization
+
+### Route Security
+- Role-based access control
+- Protected route components
+- Unauthorized access handling
+
+## 🎯 Performance Optimization
+
+### Code Splitting
+- Route-based code splitting
+- Component lazy loading
+- Bundle optimization
+
+### Caching Strategy
+- Redux state persistence
+- API response caching
+- Static asset caching
+
+### Bundle Analysis
 \`\`\`bash
-curl -X PUT http://localhost:8080/api/users/123e4567-e89b-12d3-a456-426614174000 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <jwt-token>" \
-  -d '{
-    "firstName": "John Updated",
-    "phone": "+1-555-9999",
-    "isActive": true
-  }'
+npm run analyze
+# or
+yarn analyze
 \`\`\`
 
-### Error Handling
+## 🐛 Error Handling
 
-The API provides comprehensive error handling with specific error types:
+### Global Error Boundary
+- Catches React component errors
+- Provides fallback UI
+- Error reporting integration
 
-- **ValidationError** (400): Invalid input data
-- **AuthenticationError** (401): Invalid credentials or token
-- **AuthorizationError** (403): Insufficient permissions
-- **NotFoundError** (404): Resource not found
-- **ConflictError** (409): Resource conflict
-- **InternalServerError** (500): Unexpected server error
+### API Error Handling
+- Centralized error processing
+- User-friendly error messages
+- Retry mechanisms
 
-### Security Features
+### Form Validation
+- Real-time validation
+- Field-level error display
+- Accessibility compliance
 
-1. **Password Hashing**: BCrypt with salt
-2. **JWT Tokens**: Secure token-based authentication
-3. **Role-Based Access Control**: Method-level security
-4. **CORS Configuration**: Configurable cross-origin requests
-5. **Input Validation**: Comprehensive request validation
-6. **SQL Injection Protection**: JPA/Hibernate parameterized queries
+## 🌐 API Integration
 
-### Development
-
-#### Running Tests
-\`\`\`bash
-mvn test
+### Service Layer
+\`\`\`typescript
+// Example API call
+const response = await apiService.post('/auth/login', credentials);
 \`\`\`
 
-#### Code Quality
-The project follows Spring Boot best practices:
-- Clean architecture with separation of concerns
-- Comprehensive error handling
-- Input validation
-- Security best practices
-- Proper logging
-- Transaction management
+### Request Interceptors
+- Automatic token attachment
+- Request/response logging
+- Error handling
 
-#### Database Migrations
-The project uses Liquibase for database migrations. Migration files should be placed in `src/main/resources/db/changelog/`.
+### Response Interceptors
+- Token refresh handling
+- Error transformation
+- Loading state management
 
-### Production Deployment
+## 📊 Monitoring & Analytics
 
-1. **Environment Variables**
-   \`\`\`bash
-   export SPRING_PROFILES_ACTIVE=prod
-   export DB_USERNAME=your_db_user
-   export DB_PASSWORD=your_db_password
-   export JWT_SECRET=your_secure_secret_key
-   export MAIL_HOST=your_smtp_host
-   export MAIL_USERNAME=your_email
-   export MAIL_PASSWORD=your_email_password
-   \`\`\`
+### Performance Monitoring
+- Core Web Vitals tracking
+- User interaction metrics
+- Error rate monitoring
 
-2. **Build for Production**
-   \`\`\`bash
-   mvn clean package -DskipTests
-   \`\`\`
+### User Analytics
+- Authentication events
+- Feature usage tracking
+- Performance metrics
 
-3. **Run the Application**
-   \`\`\`bash
-   java -jar target/parking-management-api-1.0.0.jar
-   \`\`\`
+## 🤝 Contributing
 
-### Contributing
+### Development Workflow
+1. Create feature branch
+2. Implement changes with tests
+3. Run linting and tests
+4. Submit pull request
+5. Code review process
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+### Code Standards
+- TypeScript strict mode
+- ESLint configuration
+- Prettier formatting
+- Conventional commits
 
-### License
+## 📚 Additional Resources
+
+- [React Documentation](https://reactjs.org/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Redux Toolkit Guide](https://redux-toolkit.js.org/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**Authentication not working**
+- Check API endpoint configuration
+- Verify CORS settings
+- Check network connectivity
+
+**Build failures**
+- Clear node_modules and reinstall
+- Check TypeScript errors
+- Verify environment variables
+
+**Styling issues**
+- Check Tailwind CSS configuration
+- Verify CSS imports
+- Clear browser cache
+
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 \`\`\`
 
-Finally, let's create a simple test class to demonstrate the setup:
+This comprehensive frontend implementation provides:
+
+## ✅ **Completed Features**
+
+### **1. Authentication System**
+- ✅ JWT-based authentication with refresh tokens
+- ✅ Secure login and registration forms
+- ✅ Automatic token refresh and management
+- ✅ Persistent authentication state
+
+### **2. State Management**
+- ✅ Redux Toolkit for efficient state management
+- ✅ Redux Persist for state persistence
+- ✅ Custom hooks for easy state access
+- ✅ Type-safe state management
+
+### **3. Route Protection**
+- ✅ Role-based route protection
+- ✅ Public and protected route components
+- ✅ Unauthorized access handling
+- ✅ Automatic redirects
+
+### **4. UI/UX Design**
+- ✅ Modern, responsive design with Tailwind CSS
+- ✅ Reusable UI components
+- ✅ Accessibility features
+- ✅ Mobile-first approach
+
+### **5. Form Handling**
+- ✅ Custom form hook with validation
+- ✅ Real-time validation feedback
+- ✅ Error handling and display
+- ✅ Type-safe form management
+
+### **6. API Integration**
+- ✅ Axios-based API service
+- ✅ Request/response interceptors
+- ✅ Error handling and retry logic
+- ✅ Type-safe API calls
+
+The solution is production-ready, scalable, and follows React/TypeScript best practices with comprehensive documentation and testing capabilities.

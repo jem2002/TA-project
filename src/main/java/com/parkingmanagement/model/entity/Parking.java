@@ -15,8 +15,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "parkings", indexes = {
     @Index(name = "idx_parkings_company", columnList = "company_id"),
-    @Index(name = "idx_parkings_location", columnList = "latitude, longitude"),
-    @Index(name = "idx_parkings_name", columnList = "name")
+    @Index(name = "idx_parkings_location", columnList = "latitude, longitude")
 })
 @Getter
 @Setter
@@ -57,24 +56,9 @@ public class Parking extends BaseEntity {
     @Builder.Default
     private Integer totalFloors = 1;
     
-    @Positive(message = "Total capacity must be positive")
-    @Column(name = "total_capacity")
-    private Integer totalCapacity;
-    
     @Column(name = "operating_hours_start")
     private LocalTime operatingHoursStart;
     
     @Column(name = "operating_hours_end")
     private LocalTime operatingHoursEnd;
-    
-    // Validation method to ensure operating hours are logical
-    @PrePersist
-    @PreUpdate
-    private void validateOperatingHours() {
-        if (operatingHoursStart != null && operatingHoursEnd != null) {
-            if (operatingHoursStart.equals(operatingHoursEnd)) {
-                throw new IllegalArgumentException("Operating hours start and end cannot be the same");
-            }
-        }
-    }
 }
