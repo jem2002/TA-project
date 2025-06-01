@@ -1,21 +1,18 @@
 package com.parkingmanagement.dto.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class CreateCompanyRequest {
-    @NotBlank(message = "Company name is required")
+public class UpdateCompanyRequest {
     @Size(min = 2, max = 255, message = "Company name must be between 2 and 255 characters")
     private String name;
     
     @Size(max = 1000, message = "Description must not exceed 1000 characters")
     private String description;
     
-    @NotBlank(message = "Address is required")
     @Size(min = 10, max = 500, message = "Address must be between 10 and 500 characters")
     private String address;
     
@@ -31,4 +28,6 @@ public class CreateCompanyRequest {
              message = "Invalid website URL format")
     @Size(max = 255, message = "Website URL must not exceed 255 characters")
     private String website;
+    
+    private Boolean isActive;
 }
