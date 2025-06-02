@@ -1,147 +1,114 @@
 "use client"
 
 import type React from "react"
-import { useEffect } from "react"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { Provider } from "react-redux"
-import { PersistGate } from "redux-persist/integration/react"
-import { store, persistor } from "@/store"
-import { useAuth } from "@/hooks/useAuth"
-import { UserRole } from "@/types/auth.types"
+import { store } from "./store"
+import { LoginPage } from "./pages/auth/LoginPage"
+import { RegisterPage } from "./pages/auth/RegisterPage"
+import { DashboardPage } from "./pages/DashboardPage"
+import { CashierDashboard } from "./pages/cashier/CashierDashboard"
+import { ProtectedRoute } from "./components/auth/ProtectedRoute"
+import { PublicRoute } from "./components/auth/PublicRoute"
+import { UnauthorizedPage } from "./pages/UnauthorizedPage"
+import { LoadingSpinner } from "./components/ui/LoadingSpinner"
+import { useAuth } from "./hooks/useAuth"
+import { CustomerDashboard } from "./pages/customer/CustomerDashboard"
+import { ReservationManagement } from "./pages/customer/ReservationManagement"
+import { LoyaltyRewards } from "./pages/customer/LoyaltyRewards"
 
-// Components
-import ProtectedRoute from "@/components/auth/ProtectedRoute"
-import PublicRoute from "@/components/auth/PublicRoute"
-import LoadingSpinner from "@/components/ui/LoadingSpinner"
-
-// Pages
-import LoginPage from "@/pages/auth/LoginPage"
-import RegisterPage from "@/pages/auth/RegisterPage"
-import DashboardPage from "@/pages/DashboardPage"
-import UnauthorizedPage from "@/pages/UnauthorizedPage"
-
-// App Content Component (inside Redux Provider)
 const AppContent: React.FC = () => {
-  const { isAuthenticated, isLoading, fetchCurrentUser } = useAuth()
-
-  // Fetch current user data on app initialization
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchCurrentUser()
-    }
-  }, [isAuthenticated, fetchCurrentUser])
+  const { isLoading } = useAuth()
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     )
   }
 
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
+    <Routes>
+      {/* Public Routes */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PublicRoute>
+            <RegisterPage />
+          </PublicRoute>
+        }
+      />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
+      {/* Protected Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN", "MANAGER", "EMPLOYEE"]}>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Admin Only Routes */}
-        <Route
-          path="/admin/*"
-          element={
-            <ProtectedRoute requiredRoles={[UserRole.GENERAL_ADMIN]}>
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Admin Panel</h1>
-                <p className="text-gray-600 mt-2">Admin features coming soon...</p>
-              </div>
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/cashier"
+        element={
+          <ProtectedRoute allowedRoles={["CASHIER", "MANAGER", "ADMIN"]}>
+            <CashierDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer"
+        element={
+          <ProtectedRoute allowedRoles={["CLIENT", "CUSTOMER"]}>
+            <CustomerDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/reservations"
+        element={
+          <ProtectedRoute allowedRoles={["CLIENT", "CUSTOMER"]}>
+            <ReservationManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/loyalty"
+        element={
+          <ProtectedRoute allowedRoles={["CLIENT", "CUSTOMER"]}>
+            <LoyaltyRewards />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Company Admin Routes */}
-        <Route
-          path="/company/*"
-          element={
-            <ProtectedRoute requiredRoles={[UserRole.GENERAL_ADMIN, UserRole.COMPANY_ADMIN]}>
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Company Management</h1>
-                <p className="text-gray-600 mt-2">Company features coming soon...</p>
-              </div>
-            </ProtectedRoute>
-          }
-        />
+      {/* Error Routes */}
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-        {/* Error Pages */}
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-        {/* Default Redirects */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
-        />
-
-        {/* 404 Page */}
-        <Route
-          path="*"
-          element={
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-                <p className="text-gray-600 mb-6">Page not found</p>
-                <a href="/" className="text-primary-600 hover:text-primary-500 font-medium">
-                  Go back home
-                </a>
-              </div>
-            </div>
-          }
-        />
-      </Routes>
-    </Router>
+      {/* Default Redirects */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   )
 }
 
-// Main App Component
-const App: React.FC = () => {
+export const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <PersistGate
-        loading={
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <LoadingSpinner size="lg" />
-          </div>
-        }
-        persistor={persistor}
-      >
-        <AppContent />
-      </PersistGate>
+      <Router>
+        <div className="App">
+          <AppContent />
+        </div>
+      </Router>
     </Provider>
   )
 }

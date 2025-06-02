@@ -1,7 +1,7 @@
 "use client"
 
-import Button from "../src/components/ui/Button"
+import Alert from "../src/components/ui/Alert"
 
 export default function SyntheticV0PageForDeployment() {
-  return <Button />
+  return <Alert />
 }
